@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Higher-Order Functions</title>
+  <link rel="shortcut icon" href="favicon.ico"/>
+  <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
+  <style>
+* {
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: #eee;
+  margin: 2.5rem auto;
+  max-width: 650px;
+  line-height: 1.6;
+  font-size: 1.125rem;
+  color: #333;
+  padding: 0 1rem;
+}
+h1, h2, h3 {
+  line-height: 1.2;
+}
+
+pre, code, .CodeMirror, .CodeMirror * {
+  font-family: Inconsolata, Consolas, monospace;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.author {
+  margin-top: -1rem; display: flex; justify-content: flex-end; font-style: italic;
+}
+nav {
+  font-style: italic;
+}
+nav hr {
+  border: 0;
+  border-bottom: 1px solid #999;
+}
+nav h2 {
+  font-size: 1.5rem;
+  margin: 0.75rem 0;
+}
+nav ul {
+  list-style: none;
+  padding-left: 1rem;
+  margin: 0;
+}
+nav li {
+  margin: 0;
+}
+small {
+  display: inline-block;
+  line-height: 1.4;
+}
+.objs {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -0.5rem;
+}
+.objs pre {
+  line-height: 1.2;
+  background: #ccc;
+  margin: 0.5rem;
+  padding: 0.5rem;
+}
+button {
+  appearance: none;
+  cursor: pointer;
+  font-family: sans-serif;
+  font-size: 1.125rem;
+  background: #ccc;
+  color: #333;
+  border: none;
+  border-radius: 0.25rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  transition: transform 0.3s ease;
+}
+button:hover {
+  transform: translateY(-2px);
+}
+.result {
+  background: #333;
+  margin: 0;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  color: lime;
+  overflow-x: auto;
+}
+.result:empty {
+  display: none;
+}
+.result.error {
+  background: #fcc;
+  color: red;
+}
+  </style>
+</head>
+<body>
+  <h1>Higher-Order Functions</h1>
+  <p class="author">with Michael McLeod (5886760).</p>
+  <nav>
+    <hr/>
+    <h2>Contents</h2>
+    <ul>
+      <li><a href="#lesson-one">Lesson One</a></li>
+      <ul>
+        <li><a href="#recycling-problem">A recycling problem</a></li>
+        <li><a href="#reusing-code">Reusing code</a></li>
+        <li><a href="#anonymous-functions">Anonymous functions</a></li>
+        <li><a href="#conclusion-one">Putting it all together</a></li>
+      </ul>
+      <li><a href="#lesson-two">Lesson Two</a></li>
+    </ul>
+    <hr/>
+  </nav>
+  <h2 id="lesson-one">Lesson One</h2>
+  <h3 id="recycling-problem">A recycling problem</h3>
+  <p>
+    Reusing as many things as we can is a great way to save resources,
+    and nobody understands that better than your local paper recycling plant.
+  </p>
+  <p>
+    But the paper recycling plant has a problem!
+    They are receiving a whole lot of recycling,
+    but not all of it is paper. And so they have called upon you
+    to help them work out what belongs and what doesn't.
+  </p>
+  <p>
+    This is what they know about their recycling items:
+  </p>
+  <div class="objs">
+<pre>{
+ name: "Newspapers",
+ type: "paper",
+ amount: 10,
+ weight: 220
+}</pre>
+<pre>{
+ name: "Milk bottles",
+ type: "plastic",
+ amount: 6,
+ weight: 62
+}</pre>
+<pre>{
+ name: "Boxes",
+ type: "paper",
+ amount: 5,
+ weight: 130
+}</pre>
+<pre>{
+ name: "Egg cartons",
+ type: "paper",
+ amount: 3,
+ weight: 20
+}</pre>
+<pre>{
+ name: "Tin cans",
+ type: "metal",
+ amount: 9,
+ weight: 20
+}</pre>
+<pre>{
+ name: "Magazines",
+ type: "paper",
+ amount: 2,
+ weight: 150
+}</pre>
+<pre>{
+ name: "Glass bottles",
+ type: "glass",
+ amount: 7,
+ weight: 600
+}</pre>
+<pre>{
+ name: "Yoghurt pots",
+ type: "plasic",
+ amount: 12,
+ weight: 5
+}</pre>
+  </div>
+  <p>
+    You have come up with a function that will help them work out
+    if an item belongs at the paper recycling plant, and it looks like this:
+  </p>
+  <textarea id="t1" style="display:none" autocomplete="off">
+function checkPaper(item) {
+  if (item.type === 'paper') {
+    console.log('Yes! ' + item.name + ' can be recycled here.');
+  } else {
+    console.log('No! ' + item.name + ' must be recycled somewhere else.');
+  }
+}
+
+checkPaper({ name: 'Newspapers', type: 'paper' });
+checkPaper({ name: 'Milk bottles', type: 'plastic' });
+checkPaper({ name: 'Tin cans', type: 'metal' });</textarea>
+  <button data-textarea="t1" data-result="r1">Run</button>
+  <pre id="r1" class="result"></pre>
+  <p>
+    It works! In fact, it works so well that the local <em>plastic</em>
+    recycling plant would like you to do the same thing for them.
+    So you give them the following function, that is almost identical to <code>checkPaper</code>:
+  </p>
+  <textarea id="t2" style="display:none" autocomplete="off">
+function checkPlastic(item) {
+  if (item.type === 'plastic') {
+    console.log('Yes! ' + item.name + ' can be recycled here.');
+  } else {
+    console.log('No! ' + item.name + ' must be recycled somewhere else.');
+  }
+}
+
+checkPlastic({ name: 'Newspapers', type: 'paper' });
+checkPlastic({ name: 'Milk bottles', type: 'plastic' });
+checkPlastic({ name: 'Tin cans', type: 'metal' });</textarea>
+  <button data-textarea="t2" data-result="r2">Run</button>
+  <pre id="r2" class="result"></pre>
+  <p>
+    But now you have a problem of your own. The recycling plants want you
+    to update your code so that it also prints how many of each item there are.
+    But your code is now in two places, and every time you make a change to
+    <code>checkPaper</code>, you will have to remember to make the same change
+    to <code>checkPlastic</code> as well.
+  </p>
+  <h3 id="reusing-code">Reusing code</h3>
+  <p>
+    Reusing things in programming is just as important as it is in recycling,
+    because it will help you avoid problems like this one. Whenever you encounter
+    two very similar functions like <code>checkPaper</code> and <code>checkPlastic</code>,
+    it is a good idea to try to separate out the common functionality.
+  </p>
+  <p>
+    Here is a function called <code>check</code> that does just that:
+  </p>
+  <textarea id="t3" style="display:none" autocomplete="off">
+function check(item, test) {
+  if (test(item)) {
+    console.log('Yes! ' + item.name + ' can be recycled here.');
+  } else {
+    console.log('No! ' + item.name + ' must be recycled somewhere else.');
+  }
+}</textarea>
+  <p>
+    The only part that was different between <code>checkPaper</code> and
+    <code>checkPlastic</code> was the code inside the <code>if</code>-statement,
+    so we have replaced that code with something new called <code>test</code>,
+    that we can pass to the function as an argument.
+  </p>
+  <p>
+    But what is <code>test</code>? Well, we can see on line 2 that we are using it
+    like a function, and that is exactly what it is.
+    It takes <code>item</code> as a parameter and returns <code>true</code> or <code>false</code>.
+  </p>
+  <p>
+    A function that takes another function as an argument, like <code>check</code>,
+    is called a <strong>higher-order function</strong>.
+  </p>
+  <p>
+    This is how we would use <code>test</code> to check for paper:
+  </p>
+  <textarea id="t4" style="display:none" autocomplete="off">
+let testPaper = function (item) {
+  return item.type === 'paper';
+}
+
+check({ name: 'Newspapers', type: 'paper' }, testPaper);
+check({ name: 'Milk bottles', type: 'plastic' }, testPaper);
+check({ name: 'Tin cans', type: 'metal' }, testPaper);</textarea>
+  <button data-textarea="t4" data-result="r4">Run</button>
+  <pre id="r4" class="result"></pre>
+  <p>
+    We are passing <code>testPaper</code> as the second argument to <code>check</code>,
+    and it is evaluating it when it runs <code>test(item)</code>.
+  </p>
+  <p>
+    Notice that we do <em>not</em> put any brackets after <code>testPaper</code>
+    when we pass it to <code>check</code>, because we don't want the function
+    to be executed until later. We are using the function <em>as a variable</em>.
+  </p>
+  <h3 id="anonymous-functions">Anonymous functions</h3>
+  <p>
+    That is also the reason why the code says <code>"let testPaper = function"</code>
+    instead of <code>"function testPaper"</code>. These are more or less the same
+    in JavaScript, but the first way makes it extra clear that we are using a variable.
+  </p>
+  <p>
+    JavaScript actually has a bunch of shortcuts for when you are using a function as a variable.
+    All the examples below mean exactly* the same thing:
+  </p>
+  <textarea id="t5" style="display:none" autocomplete="off">
+// Normal function declaration:
+function testPaper(item) {
+  return item.type === 'paper';
+}
+
+// Saving a function into the variable 'testPaper':
+let testPaper = function (item) {
+  return item.type === 'paper';
+}
+
+// When you are dealing with functions as variables,
+// the word 'function' can be replaced by an arrow (=>):
+let testPaper = (item) => {
+  return item.type === 'paper';
+}
+
+// If the 'return' statement is the ONLY line of an arrow function,
+// the braces and the word 'return' can be omitted:
+let testPaper = (item) => item.type === 'paper';
+
+// If your arrow function has EXACTLY ONE parameter,
+// the parentheses can be omitted as well:
+let testPaper = item => item.type === 'paper';
+</textarea>
+  <p><small>
+    * JavaScript actually has some slight differences between arrow functions,
+    functions declared as variables, and normally declared functions, but
+    the differences are not important for the way we are using them in these lessons.
+  </small></p>
+  <p>
+    This means that we don't even need to declare a function called <code>testPlastic</code>!
+    We can pass the function declaration stright into <code>check</code>:
+  </p>
+  <textarea id="t6" style="display:none" autocomplete="off">
+check({ name: 'Newspapers', type: 'paper' },     item => item.type === 'plastic');
+check({ name: 'Milk bottles', type: 'plastic' }, item => item.type === 'plastic');
+check({ name: 'Tin cans', type: 'metal' },       item => item.type === 'plastic');</textarea>
+  <button data-textarea="t6" data-result="r6">Run</button>
+  <pre id="r6" class="result"></pre>
+  <p>
+    Of course, we still <em>should</em> declare a function called <code>testPlastic</code>,
+    because we are using it multiple times. But if we were only using it once,
+    then we would be able to declare it like we have above.
+  </p>
+  <p>
+    When a function is mentioned only once and is never assigned to a variable,
+    it is often called an <strong>anonymous function</strong>.
+  </p>
+  <h3 id="conclusion-one">Putting it all together</h3>
+  <p>
+    Now we are finally ready to make that update to the recycling plant code
+    so that it also prints how many of each item there are:
+  </p>
+  <textarea id="t7" style="display:none" autocomplete="off">
+function check(item, test) {
+  if (test(item)) {
+    console.log('Yes! ' + item.amount + ' ' + item.name + ' can be recycled here.');
+  } else {
+    console.log('No! ' + item.amount + ' ' + item.name + ' must be recycled somewhere else.');
+  }
+}
+
+let testPaper = item => item.type === 'paper';
+let testPlastic = item => item.type === 'plastic';
+
+console.log('Paper recycling:');
+check({ name: 'Newspapers', type: 'paper', amount: 10 }, testPaper);
+check({ name: 'Milk bottles', type: 'plastic', amount: 6 }, testPaper);
+check({ name: 'Tin cans', type: 'metal', amount: 9 }, testPaper);
+
+console.log('Plastic recycling:');
+check({ name: 'Newspapers', type: 'paper', amount: 10 }, testPlastic);
+check({ name: 'Milk bottles', type: 'plastic', amount: 6 }, testPlastic);
+check({ name: 'Tin cans', type: 'metal', amount: 9 }, testPlastic);</textarea>
+  <button data-textarea="t7" data-result="r7">Run</button>
+  <pre id="r7" class="result"></pre>
+  <p>
+    Because the paper and plastic recycling plants are both using the same
+    <code>check</code> function, we only had to make the update in one place,
+    and it instantly worked for both recycling plants!
+  </p>
+  <p>
+    We've also made it much easier to help the glass or metal recycling plants
+    if they ever want to hire our services. Have a go at editing the code above,
+    and see if you can work out how you would use <code>check</code>
+    to help those other recycling plants.
+  </p>
+  <h2 id="lesson-two">Lesson Two</h2>
+  <script src="https://codemirror.net/lib/codemirror.js"></script>
+  <script src="https://codemirror.net/mode/javascript/javascript.js"></script>
+  <script>
+//function readOnly() {
+//  editor.getDoc().markText({line: -1}, {line: 0}, {readOnly: true, css: 'color:grey;font-style:italic'});
+//  editor.getDoc().markText({line: 7}, {line: 9}, {readOnly: true, css: 'color:grey;font-style:italic'});
+//}
+document.querySelectorAll('textarea').forEach(textarea => {
+  let editor = CodeMirror.fromTextArea(textarea, {
+    lineNumbers: true,
+    extraKeys: { Tab(e) { e.replaceSelection('  ', 'end'); } },
+  });
+  document.querySelectorAll(`button[data-textarea="${textarea.id}"]`).forEach(button => {
+    button.addEventListener('click', () => {
+      let result = document.querySelector(`#${button.getAttribute('data-result')}`);
+      result.innerHTML = '';
+      result.classList.remove('error');
+      if (textarea.id === 't4' || textarea.id === 't6') {
+        function check(item, test) {
+          if (test(item)) {
+            console.log('Yes! ' + item.name + ' can be recycled here.');
+          } else {
+            console.log('No! ' + item.name + ' must be recycled somewhere else.');
+          }
+        };
+      }
+      let log = console.log;
+      console.log = v => result.innerHTML += v + '\n';
+      try {
+        eval(editor.getDoc().getValue());
+      } catch (e) {
+        result.innerHTML = e;
+        result.classList.add('error');
+      }
+      console.log = log;
+    });
+  });
+});
+  </script>
+</body>
+</html>
