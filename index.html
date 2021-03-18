@@ -589,8 +589,15 @@ let result = textfile.split('\n').map(line => {
 }).join('\n');
 
 console.log(result);</textarea>
-      <button data-textarea="t15" data-result="r15">Run</button>
-      <pre id="r15" class="result"></pre>
+  <button data-textarea="t15" data-result="r15">Run</button>
+  <pre id="r15" class="result"></pre>
+  <p>
+    One thing to be careful of when chaining functions is that
+    you don't get too carried away. Sometimes it is nice to create
+    extra variables than is necessary, so that people can understand your code
+    by breaking it up into nice easy chunks, instead of having to
+    follow it from start to finish.
+  </p>
   <script src="https://codemirror.net/lib/codemirror.js"></script>
   <script src="https://codemirror.net/mode/javascript/javascript.js"></script>
   <script>
