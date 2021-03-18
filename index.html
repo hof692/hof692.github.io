@@ -23,14 +23,17 @@ body {
   color: #333;
   padding: 0 1rem;
 }
-h1, h2, h3 {
+h1, h2, h3, h4 {
   line-height: 1.2;
 }
 
-pre, code, .CodeMirror, .CodeMirror * {
+pre, .CodeMirror, .CodeMirror * {
   font-family: Inconsolata, Consolas, monospace;
   font-size: 1rem;
   line-height: 1.4;
+}
+code {
+  font-family: Inconsolata, Consolas, monospace;
 }
 
 .author {
@@ -128,6 +131,12 @@ button:hover {
         <li><a href="#filter">Filter</a></li>
         <li><a href="#map">Map</a></li>
         <li><a href="#chaining">Chaining functions</a></li>
+      </ul>
+      <li><a href="#lesson-three">Lesson Three</a></li>
+      <ul>
+        <li><a href="#reduce">Reduce</a></li>
+        <li><a href="#all-you-need">Reduce is all you need</a></li>
+        <li><a href="#conclusion-three">What have I learned?</a></li>
       </ul>
     </ul>
     <hr/>
@@ -546,8 +555,8 @@ let squares = [1,2,3,4,5].map(x => x ** 2);
 console.log(squares);
 
 // Convert all the recycling item names to upper case
-let shouty = recycling.map(item => item.name.toUpperCase());
-console.log(shouty);</textarea>
+let loud = recycling.map(item => item.name.toUpperCase());
+console.log(loud);</textarea>
   <button data-textarea="t13" data-result="r13">Run</button>
   <pre id="r13" class="result"></pre>
   <h3 id="chaining">Chaining functions</h3>
@@ -556,7 +565,7 @@ console.log(shouty);</textarea>
     but it's not the only benefit of <strong><code>filter</code></strong>
     and <strong><code>map</code></strong>.
     Because they both operate on a list, they can be chained together
-    one after another without creating intermediate variables.
+    one after another, without creating intermediate variables.
   </p>
   <p>
     Here is a fast way we could've gotten the names of paper items:
@@ -568,7 +577,7 @@ console.log(result);</textarea>
   <button data-textarea="t14" data-result="r14">Run</button>
   <pre id="r14" class="result"></pre>
   <p>
-    And if we had to read and tidy the recycling information
+    And if we wanted to manipulate information
     from a comma separated text file like this one:
   </p>
   <pre class="recycling-list">Newspapers,paper,10,220
@@ -580,7 +589,8 @@ Magazines,paper,2,150
 Glass bottles,glass,7,600
 Yoghurt pots,plastic,12,5</pre>
   <p>
-    Then with map it would be as simple as splitting it up and joining it back together again:
+    Then with <strong><code>map</code></strong> it would be as
+    simple as splitting it up and joining it back together again:
   </p>
   <textarea id="t15" style="display:none" autocomplete="off">
 let result = textfile.split('\n').map(line => {
@@ -594,9 +604,238 @@ console.log(result);</textarea>
   <p>
     One thing to be careful of when chaining functions is that
     you don't get too carried away. Sometimes it is nice to create
-    extra variables than is necessary, so that people can understand your code
+    more variables than is necessary, so that people can understand your code
     by breaking it up into nice easy chunks, instead of having to
     follow it from start to finish.
+  </p>
+  <h2 id="lesson-three">Lesson Three</h2>
+  <h3 id="reduce">Reduce</h3>
+  <p>
+    So far we have been talking a lot about recycling and reusing code,
+    but we've ignored the other big R word, and that is <strong><code>reduce</code></strong>.
+  </p>
+  <p>
+    <strong><code>reduce</code></strong> is a <strong>higher-order function</strong>
+    like <strong><code>filter</code></strong> and <strong><code>map</code></strong>,
+    and it also operates on a list, but it doesn't produce a list as output.
+    <strong><code>reduce</code></strong> is for grouping things together to produce
+    a <em>single</em> output.
+  </p>
+  <p>
+    Here is what the <strong><code>reduce</code></strong> function looks like,
+    except that, as with <strong><code>filter</code></strong> and <strong><code>map</code></strong>,
+    the version in the JavaScript standard library has the <code>list</code>
+    on the outside, so it looks like <code>list.reduce(operation, startValue)</code>.
+  </p>
+  <textarea id="t16" style="display:none" autocomplete="off">
+function reduce(list, operation, startValue) {
+  let result = startValue;
+  for (let item of list) {
+    result = operation(result, item);
+  }
+  return result;
+}</textarea>
+  <p>
+    This looks quite similar to <strong><code>filter</code></strong> and
+    <strong><code>map</code></strong>, but we can also see some differences.
+    Firstly, <strong><code>reduce</code></strong> takes an extra parameter – the
+    <code>startValue</code> – because the result does not always start out
+    as an empty array. But more importantly, the function parameter <code>operation</code>
+    now takes two arguments: it doesn't just operate on the <code>item</code>; it also
+    does something to add it to the result.
+  </p>
+  <p>
+    The most common use of <strong><code>reduce</code></strong> is summing
+    everything together. Below is an example of how you would sum things
+    with reduce, and an expanded version that shows you how everything is put together:
+  </p>
+  <textarea id="t17" style="display:none" autocomplete="off">
+let sum =
+  [1,2,3,4,5].reduce((result, item) => result + item, 0);
+
+// This is the same as the above
+function reduceToSum(list) {
+  let result = 0; // startValue = 0
+  for (let item of list) {
+    result = result + item; // operation(result, item) = result + item
+  }
+  return result;
+}
+sum = reduceToSum([1,2,3,4,5]);
+
+console.log(sum);</textarea>
+  <button data-textarea="t17" data-result="r17">Run</button>
+  <pre id="r17" class="result"></pre>
+  <p>
+    The paper recycling plant would like to know how many
+    items of all types they are receiving in total.
+    How would you work this out using <strong><code>reduce</code></strong>?
+  </p>
+  <textarea id="t18" style="display:none" autocomplete="off">
+let total =
+  recycling.reduce( // ...?
+
+console.log(total);</textarea>
+  <button data-textarea="t18" data-result="r18">Run</button>
+  <button data-hint="t18" data-step="3">Hint (3)</button>
+  <pre id="r18" class="result"></pre>
+  <p>
+    Next they want to know only how many paper items
+    they are collecting. What can you change to achieve this?
+  </p>
+  <textarea id="t19" style="display:none" autocomplete="off">
+let total = recycling.reduce((result, item) => result + item.amount, 0);
+
+
+
+
+
+
+
+console.log(total);</textarea>
+  <button data-textarea="t19" data-result="r19">Run</button>
+  <button data-hint="t19" data-step="4">Hint (4)</button>
+  <pre id="r19" class="result"></pre>
+  <p>
+    Notice that in the above function, you still need to
+    return the sum so far, even when you don't find a match.
+    This is because the rest of the list needs that value
+    so it can keep calculating the total.
+  </p>
+  <p>
+    Of course, you could also perform the <strong><code>filter</code></strong>
+    separately to the sum, and then chain them together:
+  </p>
+  <textarea id="t20" style="display:none" autocomplete="off">
+let total =
+  recycling
+  .filter(item => item.type === 'paper')
+  .reduce((result, item) => result + item.amount, 0);
+
+console.log(total);</textarea>
+<button data-textarea="t20" data-result="r20">Run</button>
+<pre id="r20" class="result"></pre>
+  <p>
+    For a final challenge, the paper recycling plant would also
+    like to know how much their total paper items weigh.
+    The <code>weight</code> property in each recycling item
+    is only the weight of a single item, so you would need to
+    multiply this by the <code>amount</code>.
+  </p>
+  <p>
+    There a two solutions presented below – one where the whole thing
+    is done in <strong><code>reduce</code></strong> and one where
+    <strong><code>reduce</code></strong> is chained with <strong><code>filter</code></strong>.
+    Try to work out your own solution before looking at the ones provided.
+  </p>
+  
+  <textarea id="t21" style="display:none" autocomplete="off">
+let total =
+
+
+
+
+
+
+
+console.log(total + 'g');</textarea>
+  <button data-textarea="t21" data-result="r21">Run</button>
+  <button data-hint="t21" data-step="0">Solve (Reduce only)</button>
+  <button data-hint="t21" data-step="1">Solve (Filter and reduce)</button>
+  <pre id="r21" class="result"></pre>
+  <h3 id="all-you-need">Reduce is all you need</h3>
+  <p>
+    So why does <strong><code>reduce</code></strong> look so
+    much more complicated than the other
+    <strong>higher-order functions</strong> that we've seen?
+  </p>
+  <p>
+    Well, as it turns out, <strong><code>reduce</code></strong>
+    is so generic that it can be used to implement all the other
+    list operations we've seen! The trick is to use an empty array
+    as the <code>startValue</code>.
+  </p>
+  <p>
+    Have a go at implementing <stong><code>map</code></stong> with
+    <strong><code>reduce</code></strong>.
+  </p>
+  <textarea id="t22" style="display:none" autocomplete="off">
+function map(list, selection) {
+  return list.reduce( // ...?
+}
+
+let selectedNames = map(recycling, item => item.name);
+console.log(selectedNames);</textarea>
+  <button data-textarea="t22" data-result="r22">Run</button>
+  <button data-hint="t22" data-step="3">Hint (3)</button>
+  <pre id="r22" class="result"></pre>
+  <p>
+    Now try implementing <strong><code>filter</code></strong>.
+  </p>
+  <textarea id="t23" style="display:none" autocomplete="off">
+function filter(list, test) {
+  return list.reduce( // ...?
+  
+  
+  
+  
+  
+  
+}
+
+let filteredItems = filter(recycling, item => item.type === 'paper');
+console.log(filteredItems);</textarea>
+  <button data-textarea="t23" data-result="r23">Run</button>
+  <button data-hint="t23" data-step="7">Hint (7)</button>
+  <pre id="r23" class="result"></pre>
+  <p>
+    Next we are going to implement a new <strong>higher-order function</strong>
+    with <strong><code>reduce</code></strong>, called <code>every</code>.
+    It checks to see that every single item in a list matches the criteria in its
+    <code>test</code> function.
+  </p>
+  <textarea id="t24" style="display:none" autocomplete="off">
+function every(list, test) {
+  return list.reduce( // ...?
+}
+
+// Every item in 'recycling' weighs less than 1kg:
+let shouldBeTrue = every(recycling, item => item.weight &lt; 1000);
+console.log(shouldBeTrue);
+
+// Every item in 'recycling' is made of paper:
+let shouldBeFalse = every(recycling, item => item.type === 'paper');
+console.log(shouldBeFalse);</textarea>
+  <button data-textarea="t24" data-result="r24">Run</button>
+  <button data-hint="t24" data-step="3">Hint (3)</button>
+  <pre id="r24" class="result"></pre>
+  <p>
+    <code>every</code> also appears in the JavaScript standard library as
+    <code>list.every(test)</code>.
+  </p>
+  <h3 id="conclusion-three">What have I learned?</h3>
+  <p>
+    As well as being a great way to make sure you are reusing code
+    and won't have to update things in multiple places,
+    <strong>higher-order functions</strong> are found all over
+    JavaScript with different purposes.
+  </p>
+  <p>
+    <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener"><code>addEventListener</code></a>
+    takes a function called a <code>handler</code>
+    as its second argument, which tells it what to do when an event happens
+    on the page.
+  </p>
+  <p>
+    More advanced features like <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises"><code>Promises</code></a>
+    take functions called <code>callbacks</code> as arguments,
+    which they will run when they have finished
+    performing their other tasks.
+  </p>
+  <p>
+    An understanding of what <strong>higher-order functions</strong> are
+    is a vital part of becoming a JavaScript programmer,
+    and now you will know all about them when you come across them.
   </p>
   <script src="https://codemirror.net/lib/codemirror.js"></script>
   <script src="https://codemirror.net/mode/javascript/javascript.js"></script>
@@ -620,7 +859,7 @@ document.querySelectorAll('textarea').forEach(textarea => {
           }
         };
       }
-      if (['t8', 't9', 't10', 't11', 't12', 't13', 't14', 't15'].includes(textarea.id)) {
+      if (textarea.id.slice(1) > 7) {
         recycling = [
           { name: "Newspapers", type: "paper", amount: 10, weight: 220 },
           { name: "Milk bottles", type: "plastic", amount: 6, weight: 62 },
@@ -802,12 +1041,269 @@ let itemSummary = map(filteredItems, selectNamesAndAmounts);
 
 console.log(itemSummary);`,
         ],
+        't18': [
+        `let total =
+  recycling.reduce((result, item) => result + item.amount, 0);
+
+console.log(total);`,
+`let total =
+  recycling.reduce((result, item) => result + , 0);
+
+console.log(total);`,
+`let total =
+  recycling.reduce((result, item) =>  , 0);
+
+console.log(total);`,
+`let total =
+  recycling.reduce((result, item) =>  ,  );
+
+console.log(total);`,
+        ],
+        't19': [
+`let total = recycling.reduce((result, item) => {
+  if (item.type === 'paper') {
+    return result + item.amount;
+  } else {
+    return result;
+  }
+}, 0);
+
+console.log(total);`,
+`let total = recycling.reduce((result, item) => {
+  if (item.type === 'paper') {
+    return result + item.amount;
+  } else {
+    
+  }
+}, 0);
+
+console.log(total);`,
+`let total = recycling.reduce((result, item) => {
+  if (item.type === 'paper') {
+    return result + item.amount;
+  }
+  
+  
+}, 0);
+
+console.log(total);`,
+`let total = recycling.reduce((result, item) => {
+  if ( ) {
+    return result + item.amount;
+  }
+  
+  
+}, 0);
+
+console.log(total);`,
+`let total = recycling.reduce((result, item) => {
+  
+    return result + item.amount;
+  
+  
+  
+}, 0);
+
+console.log(total);`,
+        ],
+        't21': [
+`let total = recycling.reduce((result, item) => {
+  if (item.type === 'paper') {
+    return result + item.amount * item.weight;
+  } else {
+    return result;
+  }
+}, 0);
+
+console.log(total + 'g');`,
+`let total =
+  recycling
+  .filter(item => item.type === 'paper')
+  .reduce((result, item) => result + item.amount * item.weight, 0);
+
+
+
+
+console.log(total + 'g');`,
+        ],
+        't22': [
+        `function map(list, selection) {
+  return list.reduce((result, item) => result.concat(selection(item)), []);
+}
+
+let selectedNames = map(recycling, item => item.name);
+console.log(selectedNames);`,
+`function map(list, selection) {
+  return list.reduce((result, item) => result.concat( ), []);
+}
+
+let selectedNames = map(recycling, item => item.name);
+console.log(selectedNames);`,
+`function map(list, selection) {
+  return list.reduce((result, item) =>  , []);
+}
+
+let selectedNames = map(recycling, item => item.name);
+console.log(selectedNames);`,
+`function map(list, selection) {
+  return list.reduce((result, item) =>  ,  );
+}
+
+let selectedNames = map(recycling, item => item.name);
+console.log(selectedNames);`,
+        ],
+        't23': [
+`function filter(list, test) {
+  return list.reduce((result, item) => {
+    if (test(item)) {
+      return result.concat(item);
+    } else {
+      return result;
+    }
+  }, []);
+}
+
+let filteredItems = filter(recycling, item => item.type === 'paper');
+console.log(filteredItems);`,
+`function filter(list, test) {
+  return list.reduce((result, item) => {
+    if (test(item)) {
+      return result.concat(item);
+    } else {
+      
+    }
+  }, []);
+}
+
+let filteredItems = filter(recycling, item => item.type === 'paper');
+console.log(filteredItems);`,
+`function filter(list, test) {
+  return list.reduce((result, item) => {
+    if (test(item)) {
+      return result.concat(item);
+    }
+    
+    
+  }, []);
+}
+
+let filteredItems = filter(recycling, item => item.type === 'paper');
+console.log(filteredItems);`,
+`function filter(list, test) {
+  return list.reduce((result, item) => {
+    if (test(item)) {
+      return result.concat( );
+    }
+    
+    
+  }, []);
+}
+
+let filteredItems = filter(recycling, item => item.type === 'paper');
+console.log(filteredItems);`,
+`function filter(list, test) {
+  return list.reduce((result, item) => {
+    if (test(item)) {
+      
+    }
+    
+    
+  }, []);
+}
+
+let filteredItems = filter(recycling, item => item.type === 'paper');
+console.log(filteredItems);`,
+`function filter(list, test) {
+  return list.reduce((result, item) => {
+    if ( ) {
+      
+    }
+    
+    
+  }, []);
+}
+
+let filteredItems = filter(recycling, item => item.type === 'paper');
+console.log(filteredItems);`,
+`function filter(list, test) {
+  return list.reduce((result, item) => {
+    
+    
+    
+    
+    
+  }, []);
+}
+
+let filteredItems = filter(recycling, item => item.type === 'paper');
+console.log(filteredItems);`,
+`function filter(list, test) {
+  return list.reduce((result, item) => {
+    
+    
+    
+    
+    
+  },  );
+}
+
+let filteredItems = filter(recycling, item => item.type === 'paper');
+console.log(filteredItems);`,
+        ],
+        't24': [
+`function every(list, test) {
+  return list.reduce((result, item) => result && test(item), true);
+}
+
+// Every item in 'recycling' weighs less than 1kg:
+let shouldBeTrue = every(recycling, item => item.weight < 1000);
+console.log(shouldBeTrue);
+
+// Every item in 'recycling' is made of paper:
+let shouldBeFalse = every(recycling, item => item.type === 'paper');
+console.log(shouldBeFalse);`,
+`function every(list, test) {
+  return list.reduce((result, item) => result &&  , true);
+}
+
+// Every item in 'recycling' weighs less than 1kg:
+let shouldBeTrue = every(recycling, item => item.weight < 1000);
+console.log(shouldBeTrue);
+
+// Every item in 'recycling' is made of paper:
+let shouldBeFalse = every(recycling, item => item.type === 'paper');
+console.log(shouldBeFalse);`,
+`function every(list, test) {
+  return list.reduce((result, item) =>  , true);
+}
+
+// Every item in 'recycling' weighs less than 1kg:
+let shouldBeTrue = every(recycling, item => item.weight < 1000);
+console.log(shouldBeTrue);
+
+// Every item in 'recycling' is made of paper:
+let shouldBeFalse = every(recycling, item => item.type === 'paper');
+console.log(shouldBeFalse);`,
+`function every(list, test) {
+  return list.reduce((result, item) => ,  );
+}
+
+// Every item in 'recycling' weighs less than 1kg:
+let shouldBeTrue = every(recycling, item => item.weight < 1000);
+console.log(shouldBeTrue);
+
+// Every item in 'recycling' is made of paper:
+let shouldBeFalse = every(recycling, item => item.type === 'paper');
+console.log(shouldBeFalse);`,
+        ],
       })[textarea.id][step];
       editor.getDoc().setValue(output);
-      step--;
-      if (step < 0) { step = 0; }
-      button.setAttribute('data-step', step);
-      button.textContent = step ? `Hint (${step})` : 'Solve';
+      if (textarea.id !== 't21') {
+        step--;
+        if (step < 0) { step = 0; }
+        button.setAttribute('data-step', step);
+        button.textContent = step ? `Hint (${step})` : 'Solve';
+      }
     });
   });
 });
