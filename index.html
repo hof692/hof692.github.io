@@ -59,15 +59,20 @@ small {
   display: inline-block;
   line-height: 1.4;
 }
-.objs {
+.recycling-objects {
   display: flex;
   flex-wrap: wrap;
   margin: 0 -0.5rem;
 }
-.objs pre {
+.recycling-objects pre {
   line-height: 1.2;
   background: #ccc;
   margin: 0.5rem;
+  padding: 0.5rem;
+}
+.recycling-list {
+  line-height: 1.2;
+  background: #ccc;
   padding: 0.5rem;
 }
 button {
@@ -79,7 +84,7 @@ button {
   color: #333;
   border: none;
   border-radius: 0.25rem;
-  margin: 0.5rem 0;
+  margin: 0.5rem 0.5rem 0.5rem 0;
   padding: 0.5rem 0.75rem;
   transition: transform 0.3s ease;
 }
@@ -92,7 +97,8 @@ button:hover {
   padding: 1rem;
   border-radius: 0.25rem;
   color: lime;
-  overflow-x: auto;
+  max-height: 16rem;
+  overflow: auto;
 }
 .result:empty {
   display: none;
@@ -118,6 +124,11 @@ button:hover {
         <li><a href="#conclusion-one">Putting it all together</a></li>
       </ul>
       <li><a href="#lesson-two">Lesson Two</a></li>
+      <ul>
+        <li><a href="#filter">Filter</a></li>
+        <li><a href="#map">Map</a></li>
+        <li><a href="#chaining">Chaining functions</a></li>
+      </ul>
     </ul>
     <hr/>
   </nav>
@@ -136,7 +147,7 @@ button:hover {
   <p>
     This is what they know about their recycling items:
   </p>
-  <div class="objs">
+  <div class="recycling-objects">
 <pre>{
  name: "Newspapers",
  type: "paper",
@@ -181,7 +192,7 @@ button:hover {
 }</pre>
 <pre>{
  name: "Yoghurt pots",
- type: "plasic",
+ type: "plastic",
  amount: 12,
  weight: 5
 }</pre>
@@ -384,13 +395,205 @@ check({ name: 'Tin cans', type: 'metal', amount: 9 }, testPlastic);</textarea>
     to help those other recycling plants.
   </p>
   <h2 id="lesson-two">Lesson Two</h2>
+  <h3 id="filter">Filter</h3>
+  <p>
+    Thanks to you, the recycling plants are now a little more ordered, and they've
+    put all their data into a list, but they'd still like it to be filtered
+    into the different materials. Here is their list:
+  </p>
+  <pre class="recycling-list">const recycling = [
+  { name: "Newspapers", type: "paper", amount: 10, weight: 220 },
+  { name: "Milk bottles", type: "plastic", amount: 6, weight: 62 },
+  { name: "Boxes", type: "paper", amount: 5, weight: 130 },
+  { name: "Egg cartons", type: "paper", amount: 3, weight: 20 },
+  { name: "Tin cans", type: "metal", amount: 9, weight: 20 },
+  { name: "Magazines", type: "paper", amount: 2, weight: 150 },
+  { name: "Glass bottles", type: "glass", amount: 7, weight: 600 },
+  { name: "Yoghurt pots", type: "plastic", amount: 12, weight: 5 },
+];</pre>
+  <p>
+    Have a go at writing a function that will return a new list
+    of only the paper items.
+  </p>
+  <textarea id="t8" style="display:none" autocomplete="off">
+function filterPaper(list) {
+  
+  
+  
+  
+  
+  
+  
+}
+
+let filteredItems = filterPaper(recycling);
+console.log(filteredItems);</textarea>
+  <button data-textarea="t8" data-result="r8">Run</button>
+  <button data-hint="t8" data-step="3">Hint (3)</button>
+  <pre id="r8" class="result"></pre>
+  <p>
+    Can you tell what you'd have to change to create a <code>filterPlastic</code> function?
+  </p>
+  <p>
+    If you've noticed that the only thing you'll need to change is the
+    code inside the <code>if</code>-statement, then you might've also
+    noticed that this looks really similar to the situation we were in last lesson.
+  </p>
+  <p>
+    We don't really need to create separate functions called <code>filterPaper</code>
+    and <code>filterPlastic</code>; we can just create a <strong>higher-order function</strong>
+    called <code>filter</code>.
+  </p>
+  <p>
+    Can you modify <code>filterPaper</code> to create the new <code>filter</code>
+    function, that takes <code>test</code> as an argument?
+  </p>
+  <textarea id="t9" style="display:none" autocomplete="off">
+function filterPaper(list) {
+  let result = [];
+  for (let item of list) {
+    if (item.type === 'paper') {
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+let filteredItems = filter(recycling, item => item.type === 'plastic');
+console.log(filteredItems);</textarea>
+  <button data-textarea="t9" data-result="r9">Run</button>
+  <button data-hint="t9" data-step="2">Hint (2)</button>
+  <pre id="r9" class="result"></pre>
+  <p>
+    As it turns out, <strong><code>filter</code></strong> is a library function
+    in JavaScript, but instead of calling <code>filter(list, test)</code>,
+    you call <code>list.filter(test)</code>.
+  </p>
+  <p>
+    Play around with the code below and see if you can make it filter
+    only the glass items, or only the items there are more than 6 of.
+  </p>
+  <textarea id="t10" style="display:none" autocomplete="off">
+let filteredItems = recycling.filter(item => item.type === 'plastic');
+
+console.log(filteredItems);</textarea>
+  <button data-textarea="t10" data-result="r10">Run</button>
+  <pre id="r10" class="result"></pre>
+  <h3>Map</h3>
+  <p>
+    <strong><code>filter</code></strong> still leaves the recycling plants
+    with a lot of information to look at. What they'd really like is if
+    the resulting list only had the names of the items, and none of that
+    extra information.
+  </p>
+  <p>
+    Somebody working at the recycling plant has created the following function
+    to map between a list of items and a list of names.
+  </p>
+  <textarea id="t11" style="display:none" autocomplete="off">
+function mapNames(list) {
+  let result = [];
+  for (let item of list) {
+    result.push(item.name);
+  }
+  return result;
+}
+
+let filteredItems = recycling.filter(item => item.type === 'paper');
+let itemSummary = mapNames(filteredItems);
+
+console.log(itemSummary);</textarea>
+  <button data-textarea="t11" data-result="r11">Run</button>
+  <pre id="r11" class="result"></pre>
+  <p>
+    But wouldn't you believe it! Now they've decided that they still need
+    to see the amounts in brackets after the name. It wouldn't be super
+    difficult to create another function called <code>mapNamesAndAmounts</code> that
+    does almost the same thing as this function, but we've learnt by now
+    that it isn't good practice to create two very similar functions,
+    because it will be harder to keep them both up to date.
+  </p>
+  <p>
+    So how would we go about creating a generic <code>map</code> function
+    that could map from items to names, or from items to names and amounts,
+    or from anything to anything? Think about what parts of the code need to
+    change and what parts will be the same for all functions.
+  </p>
+  <textarea id="t12" style="display:none" autocomplete="off">
+function mapNames(list) {
+  let result = [];
+  for (let item of list) {
+    result.push(item.name);
+  }
+  return result;
+}
+
+let filteredItems = recycling.filter(item => item.type === 'paper');
+let itemSummary = mapNames(filteredItems);
+
+console.log(itemSummary);</textarea>
+  <button data-textarea="t12" data-result="r12">Run</button>
+  <button data-hint="t12" data-step="2">Hint (2)</button>
+  <pre id="r12" class="result"></pre>
+  <p>
+    Just like with <strong><code>filter</code></strong>,
+    <strong><code>map</code></strong> is a standard library function
+    in JavaScript that is called with <code>list.map(selection)</code>.
+  </p>
+  <textarea id="t13" style="display:none" autocomplete="off">
+// Print the first 5 square numbers
+let squares = [1,2,3,4,5].map(x => x ** 2);
+console.log(squares);
+
+// Convert all the recycling item names to upper case
+let shouty = recycling.map(item => item.name.toUpperCase());
+console.log(shouty);</textarea>
+  <button data-textarea="t13" data-result="r13">Run</button>
+  <pre id="r13" class="result"></pre>
+  <h3 id="chaining">Chaining functions</h3>
+  <p>
+    Being able to reuse code like this is useful,
+    but it's not the only benefit of <strong><code>filter</code></strong>
+    and <strong><code>map</code></strong>.
+    Because they both operate on a list, they can be chained together
+    one after another without creating intermediate variables.
+  </p>
+  <p>
+    Here is a fast way we could've gotten the names of paper items:
+  </p>
+  <textarea id="t14" style="display:none" autocomplete="off">
+let result = recycling.filter(i => i.type === 'paper').map(i => i.name);
+
+console.log(result);</textarea>
+  <button data-textarea="t14" data-result="r14">Run</button>
+  <pre id="r14" class="result"></pre>
+  <p>
+    And if we had to read and tidy the recycling information
+    from a comma separated text file like this one:
+  </p>
+  <pre class="recycling-list">Newspapers,paper,10,220
+Milk bottles,plastic,6,62
+Boxes,paper,5,130
+Egg cartons,paper,3,20
+Tin cans,metal,9,20
+Magazines,paper,2,150
+Glass bottles,glass,7,600
+Yoghurt pots,plastic,12,5</pre>
+  <p>
+    Then with map it would be as simple as splitting it up and joining it back together again:
+  </p>
+  <textarea id="t15" style="display:none" autocomplete="off">
+let result = textfile.split('\n').map(line => {
+  let item = line.split(',');
+  return item[2] + 'x ' + item[0] + ', each ' + item[3] + 'g of ' + item[1];
+}).join('\n');
+
+console.log(result);</textarea>
+      <button data-textarea="t15" data-result="r15">Run</button>
+      <pre id="r15" class="result"></pre>
   <script src="https://codemirror.net/lib/codemirror.js"></script>
   <script src="https://codemirror.net/mode/javascript/javascript.js"></script>
   <script>
-//function readOnly() {
-//  editor.getDoc().markText({line: -1}, {line: 0}, {readOnly: true, css: 'color:grey;font-style:italic'});
-//  editor.getDoc().markText({line: 7}, {line: 9}, {readOnly: true, css: 'color:grey;font-style:italic'});
-//}
 document.querySelectorAll('textarea').forEach(textarea => {
   let editor = CodeMirror.fromTextArea(textarea, {
     lineNumbers: true,
@@ -410,8 +613,37 @@ document.querySelectorAll('textarea').forEach(textarea => {
           }
         };
       }
+      if (['t8', 't9', 't10', 't11', 't12', 't13', 't14', 't15'].includes(textarea.id)) {
+        recycling = [
+          { name: "Newspapers", type: "paper", amount: 10, weight: 220 },
+          { name: "Milk bottles", type: "plastic", amount: 6, weight: 62 },
+          { name: "Boxes", type: "paper", amount: 5, weight: 130 },
+          { name: "Egg cartons", type: "paper", amount: 3, weight: 20 },
+          { name: "Tin cans", type: "metal", amount: 9, weight: 20 },
+          { name: "Magazines", type: "paper", amount: 2, weight: 150 },
+          { name: "Glass bottles", type: "glass", amount: 7, weight: 600 },
+          { name: "Yoghurt pots", type: "plastic", amount: 12, weight: 5 },
+        ];
+      }
+      if (textarea.id === 't15') {
+        textfile =
+`Newspapers,paper,10,220
+Milk bottles,plastic,6,62
+Boxes,paper,5,130
+Egg cartons,paper,3,20
+Tin cans,metal,9,20
+Magazines,paper,2,150
+Glass bottles,glass,7,600
+Yoghurt pots,plastic,12,5`;
+      }
       let log = console.log;
-      console.log = v => result.innerHTML += v + '\n';
+      console.log = v => {
+        let output = v;
+        if (typeof v === 'object') {
+          output = JSON.stringify(v, undefined, '  ');
+        }
+        result.innerHTML += output + '\n';
+      }
       try {
         eval(editor.getDoc().getValue());
       } catch (e) {
@@ -419,6 +651,156 @@ document.querySelectorAll('textarea').forEach(textarea => {
         result.classList.add('error');
       }
       console.log = log;
+    });
+  });
+  document.querySelectorAll(`button[data-hint="${textarea.id}"]`).forEach(button => {
+    button.addEventListener('click', () => {
+      let step = +button.getAttribute('data-step');
+      let output = ({
+        't8': [
+`function filterPaper(list) {
+  let result = [];
+  for (let item of list) {
+    if (item.type === 'paper') {
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+let filteredItems = filterPaper(recycling);
+console.log(filteredItems);`,
+`function filterPaper(list) {
+  let result = [];
+  for (let item of list) {
+    
+      result.push(item);
+    
+  }
+  return result;
+}
+
+let filteredItems = filterPaper(recycling);
+console.log(filteredItems);`,
+`function filterPaper(list) {
+  let result = [];
+  for (let item of list) {
+    
+    
+    
+  }
+  return result;
+}
+
+let filteredItems = filterPaper(recycling);
+console.log(filteredItems);`,
+`function filterPaper(list) {
+  let result = [];
+  
+  
+  
+  
+  
+  return result;
+}
+
+let filteredItems = filterPaper(recycling);
+console.log(filteredItems);`,
+        ],
+        't9': [
+`function filter(list, test) {
+  let result = [];
+  for (let item of list) {
+    if (test(item)) {
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+let filteredItems = filter(recycling, item => item.type === 'plastic');
+console.log(filteredItems);`,
+`function filter(list, test) {
+  let result = [];
+  for (let item of list) {
+    if (item.type === 'paper') {
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+let filteredItems = filter(recycling, item => item.type === 'plastic');
+console.log(filteredItems);`,
+`function filter(list) {
+  let result = [];
+  for (let item of list) {
+    if (item.type === 'paper') {
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+let filteredItems = filter(recycling, item => item.type === 'plastic');
+console.log(filteredItems);`,
+        ],
+        't12': [
+`function map(list, selection) {
+  let result = [];
+  for (let item of list) {
+    result.push(selection(item));
+  }
+  return result;
+}
+
+let selectNamesAndAmounts = function(item) {
+  return item.name + ' (' + item.amount + ')';
+}
+
+let filteredItems = recycling.filter(item => item.type === 'paper');
+let itemSummary = map(filteredItems, selectNamesAndAmounts);
+
+console.log(itemSummary);`,
+`function map(list, selection) {
+  let result = [];
+  for (let item of list) {
+    result.push(item.name);
+  }
+  return result;
+}
+
+let selectNamesAndAmounts = function(item) {
+  return item.name + ' (' + item.amount + ')';
+}
+
+let filteredItems = recycling.filter(item => item.type === 'paper');
+let itemSummary = map(filteredItems, selectNamesAndAmounts);
+
+console.log(itemSummary);`,
+`function mapNames(list) {
+  let result = [];
+  for (let item of list) {
+    result.push(item.name);
+  }
+  return result;
+}
+
+let selectNamesAndAmounts = function(item) {
+  return item.name + ' (' + item.amount + ')';
+}
+
+let filteredItems = recycling.filter(item => item.type === 'paper');
+let itemSummary = map(filteredItems, selectNamesAndAmounts);
+
+console.log(itemSummary);`,
+        ],
+      })[textarea.id][step];
+      editor.getDoc().setValue(output);
+      step--;
+      if (step < 0) { step = 0; }
+      button.setAttribute('data-step', step);
+      button.textContent = step ? `Hint (${step})` : 'Solve';
     });
   });
 });
